@@ -661,14 +661,16 @@ def pr_quiz5(s, galery_number, global_i, global_i_i):
     i = str(galery_number)+'_'+str(global_i)+'_'+str(global_i_i)
 
     ans = s.split('\n')
-    ans = ans[0]
+    ifNeedWords = ans[1]
+    ans = ans[0].strip()
 
     anssh = ans.split()
     random.shuffle(anssh)
     ansshstr = ''
-    for w in anssh:
-        ansshstr += w+'/'
-    ansshstr = ansshstr[:-1]
+    if '1' in ifNeedWords:
+        for w in anssh:
+            ansshstr += w+' / '
+        ansshstr = ansshstr[:-1]
     s = f"""
     <div id='quiz-wrapper-quiz5'>
     <div class="textbck{i}" id='textbck'>
@@ -691,7 +693,7 @@ def pr_quiz5(s, galery_number, global_i, global_i_i):
     """+f"""
         var Ans{i} = `{ans}`;
         $('.textbck{i} button[type="check{i}"]').click( function() """+"""{"""+f"""
-            if ($(".textarea{i}").val().toLowerCase().trim() == Ans{i}.toLowerCase())"""+"""{"""+f"""
+            if ($(".textarea{i}").val().toLowerCase().trim().replace("‘", "'").replace("’", "'") == Ans{i}.toLowerCase().trim().replace("‘", "'").replace("’", "'"))"""+"""{"""+f"""
                 $('.buttoncheck{i} button[type="check{i}"]').css('border','1px solid #5199FF');
                     $('.buttoncheck{i} button[type="check{i}"]').css('color','#ffffff');
                     $('.buttoncheck{i} button[type="check{i}"]').css('background','#5199FF');
@@ -746,7 +748,7 @@ def pr_cards(s, galery_number, global_i, global_i_i):
     """
     answersstr = """"""
     k = 1
-    for a in answers:
+    for a in answers[::-1]:
         answersstr += f"""
             <p class='end__check__ans{k}_{i}' id='end__check__ans'>{k}. {a} - {answerskeys[a][0]}</p>"""
         k += 1

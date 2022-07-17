@@ -327,7 +327,7 @@
         },
         quiz5: {
             name: "Квиз 5",
-            placeholder: "Просто текст через пробел (правильный)"
+            placeholder: "Просто текст через пробел (правильный)\n1 - Показывать слова, 0 - Нет"
         },
         quiz6: {
             name: "Квиз 6",
@@ -379,7 +379,7 @@
         },
         audioQuiz5: {
             name: "Аудиопрактика (ТТС + Квиз 5)",
-            placeholder: "Текст сверху\nТекст снизу\nТекст для озвучки\n0 (убрать шкалу времени) 1 (оставить)\nПросто текст через пробел (правильный для проверки)"
+            placeholder: "Текст сверху\nТекст снизу\nТекст для озвучки\n0 (убрать шкалу времени) 1 (оставить)\nПросто текст через пробел (правильный для проверки)\n1 - Показывать слова, 0 - Нет"
         }
     }
 
@@ -441,6 +441,10 @@
         document.querySelector(".currentQuiz").setAttribute('quiz', quizName);
         document.querySelector(".currentQuiz").textContent = dict[quizName].name;
         document.querySelector(".quizInput").value = dict[quizName].placeholder;
+        document.querySelector(".quizInput").scrollIntoView({
+            behavior: 'smooth',
+            block: "center"
+        });
         return
     }
 

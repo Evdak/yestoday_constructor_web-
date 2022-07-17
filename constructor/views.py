@@ -8,7 +8,7 @@ def index(request: HttpRequest):
 
 
 def quiz1(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -18,7 +18,7 @@ def quiz1(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def quiz2(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -28,7 +28,7 @@ def quiz2(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def quiz3(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -38,7 +38,7 @@ def quiz3(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def quiz4(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -48,17 +48,28 @@ def quiz4(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def quiz5(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
 
-    result = pr_quiz5(s, galery_number, global_i, global_i_i)
-    return JsonResponse(result)
+    s = s.split('\n')
+    result_all = {"s": """""", "galery_number": galery_number,
+                  "global_i": global_i, "global_i_i": global_i_i}
+    while len(s) >= 2:
+        result = pr_quiz5(
+            "\n".join(s[:2]), result_all['galery_number'], result_all["global_i"], result_all["global_i_i"])
+        result_all['s'] += result['s']
+        result_all['galery_number'] = result['galery_number']
+        result_all['global_i'] = result['global_i']
+        result_all['global_i_i'] = result['global_i_i']
+        for _ in range(2):
+            s.pop(0)
+    return JsonResponse(result_all)
 
 
 def quiz6(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -68,7 +79,7 @@ def quiz6(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def quiz7(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -78,7 +89,7 @@ def quiz7(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def quiz8(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -88,7 +99,7 @@ def quiz8(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def quiz9(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -98,7 +109,7 @@ def quiz9(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def audio(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -108,7 +119,7 @@ def audio(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 
 def cards(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -119,7 +130,7 @@ def cards(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 # , s: str, galery_number: str, global_i: str, global_i_i: str
 def quizphoto(request: HttpRequest):
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -130,7 +141,7 @@ def quizphoto(request: HttpRequest):
 
 # , s: str, galery_number: str, global_i: str, global_i_i: str
 def translate(request: HttpRequest):
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -141,7 +152,7 @@ def translate(request: HttpRequest):
 
 # , s: str, galery_number: str, global_i: str, global_i_i: str
 def audio_tts(request: HttpRequest):
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -149,7 +160,6 @@ def audio_tts(request: HttpRequest):
     s = s.split('\n')
     result_all = {"s": """""", "galery_number": galery_number,
                   "global_i": global_i, "global_i_i": global_i_i}
-    print('S!', s)
     while len(s) >= 4:
         result = pr_audio_tts(
             "\n".join(s[:4]), result_all['galery_number'], result_all["global_i"], result_all["global_i_i"])
@@ -163,7 +173,7 @@ def audio_tts(request: HttpRequest):
 
 
 def video(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -174,7 +184,7 @@ def video(request: HttpRequest):  # , s: str, galery_number: str, global_i: str,
 
 # , s: str, galery_number: str, global_i: str, global_i_i: str
 def quizOrder(request: HttpRequest):
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -184,7 +194,7 @@ def quizOrder(request: HttpRequest):
 
 
 def stt(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, global_i_i: str
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -195,7 +205,7 @@ def stt(request: HttpRequest):  # , s: str, galery_number: str, global_i: str, g
 
 # , s: str, galery_number: str, global_i: str, global_i_i: str
 def quiztable(request: HttpRequest):
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -205,7 +215,7 @@ def quiztable(request: HttpRequest):
 
 
 def audioQuiz5(request: HttpRequest):
-    s = request.GET.get('s')
+    s = request.GET.get('s').replace("‘", "'").replace("’", "'")
     galery_number = int(request.GET.get('galery_number'))
     global_i = int(request.GET.get('global_i'))
     global_i_i = int(request.GET.get('global_i_i'))
@@ -213,8 +223,7 @@ def audioQuiz5(request: HttpRequest):
     s = s.split('\n')
     result_all = {"s": """""", "galery_number": galery_number,
                   "global_i": global_i, "global_i_i": global_i_i}
-    print('S!', s)
-    while len(s) >= 5:
+    while len(s) >= 6:
         result = pr_audio_tts(
             "\n".join(s[:4]), result_all['galery_number'], result_all["global_i"], result_all["global_i_i"])
         result_all['s'] += result['s']
@@ -226,22 +235,22 @@ def audioQuiz5(request: HttpRequest):
             s.pop(0)
 
         result = pr_quiz5(
-            "\n".join(s[:4]), result_all['galery_number'], result_all["global_i"], result_all["global_i_i"])
+            "\n".join(s[:2]), result_all['galery_number'], result_all["global_i"], result_all["global_i_i"])
 
         result_all['s'] += result['s']
         result_all['galery_number'] = result['galery_number']
         result_all['global_i'] = result['global_i']
         result_all['global_i_i'] = result['global_i_i']
 
-        for _ in range(1):
+        for _ in range(2):
             s.pop(0)
     s: str = result_all['s']
     s = s.replace('<div class="audio-tts',
                   '<br>\n<div class="audio-tts')
 
-    while "id='task'" in s:
-        s = srez_v2(s, "id=\'task\'>", "</p>")
-        s = s.replace("id='task'", "id=\"task\"", 1)
+    # while "id='task'" in s:
+    #     s = srez_v2(s, "id=\'task\'>", "</p>")
+    #     s = s.replace("id='task'", "id=\"task\"", 1)
 
     s = s.replace('<br>\n<div class="audio-tts',
                   '<div class="audio-tts', 1)
