@@ -1,5 +1,7 @@
 import random
 import requests
+from getcourse.models import Audio
+from yestoday_constructor_2.settings import ALLOWED_HOSTS
 
 
 def srez_v2(str, start, end):
@@ -15,123 +17,63 @@ def pr_audio(s, galery_number, global_i, global_i_i):
     result_all = """"""
     i = str(galery_number)+'_'+str(global_i)+'_'+str(global_i_i)
     s = s.split('\n')
-    textup = s[0]
-    textdown = s[1]
-    url = s[2]
-    seekbar = int(s[3])
-    if seekbar == 0:
-        display = ' style="display:none"'
+    textup = s[0].strip()
+    textdown = s[1].strip()
+    url = s[2].strip()
+    seekbar = bool(int(s[3]))
+    audio, created = Audio.objects.get_or_create(
+        text_up=textup,
+        text_down=textdown,
+        seekbar=seekbar,
+        src=url,
+        file=None,
+    )
+    if seekbar:
+        seekbar = """
+        <div>
+                    <progress class="podcast-progress" id='podcast-progress' value="0" max="1"
+                        onclick="audioTimeLineClick(this, event)"></progress>
+                    <div class="f-container" id='f-container'>
+                        <div class="podcast-time" id='podcast-time'>00:00 / 00:00</div>
+                        <div class="podcast-speed" id='podcast-speed'>
+                            <a class="podcast-speed-10 active" href="javascript:void(0)"
+                                onclick="audioChangeSpeedClick(this)">1x</a> / <a class="podcast-speed-15"
+                                href="javascript:void(0)" onclick="audioChangeSpeedClick(this)">1.5x</a> / <a
+                                class="podcast-speed-20" href="javascript:void(0)"
+                                onclick="audioChangeSpeedClick(this)">2x</a>
+                        </div>
+                    </div>
+                </div>
+        """
     else:
-        display = ''
+        seekbar = ""
 
     result = f"""
-    <div class='audio-add{i}' id='audio-add'>
-    <audio class="audio-player{i}" id='audio-player' src="{url}"></audio> 
-    <div class="podcast-container" id='podcast-container'>
-        <div class="h-container" id='h-container'> 
-            <div class="podcast-playpause" id='podcast-playpause'>
-                <img class="play" id="play" src="https://fs.getcourse.ru/fileservice/file/download/a/44237/sc/337/h/cb28b80bb66ad56d3c12fd1885bc3ef8.svg" hspace="10" align="left">
-                <img class="pause" id="pause" src="https://fs.getcourse.ru/fileservice/file/download/a/44237/sc/197/h/7395c5433ab34099a1d5b9b139efdd5b.svg" hspace="10" align="left">
+    <div class='audio-add{audio.id} audio-div' id='audio-add'>
+            <audio class="audio-player{audio.id}" id='audio-player' src="{'https://'+ALLOWED_HOSTS[0]+audio.file.url if 'api.voicerss.org' in audio.src else audio.src}"
+                onended="audioOnEnded(this)" oncanplay="audioOnCanPlay(this)" onplay="audioPlay(this)"
+                onpause="audioPause(this)"></audio>
+            <div class="podcast-container" id='podcast-container'>
+                <div class="h-container" id='h-container'>
+                    <div class="podcast-playpause" id='podcast-playpause'>
+                        <img class="play" id="play"
+                            src="https://fs.getcourse.ru/fileservice/file/download/a/44237/sc/337/h/cb28b80bb66ad56d3c12fd1885bc3ef8.svg"
+                            onclick="playPauseClick(this)">
+                        <img class="pause" id="pause"
+                            src="https://fs.getcourse.ru/fileservice/file/download/a/44237/sc/197/h/7395c5433ab34099a1d5b9b139efdd5b.svg"
+                            onclick="playPauseClick(this)">
+                    </div>
+                    <div>
+                        <div class="podcast-title" id='podcast-title'>{audio.text_up}</div>
+                        <div class="podcast-subtitle" id='podcast-subtitle'>{audio.text_down}</div>
+                    </div>
+                </div>
+                
             </div>
-            <div>
-                <div class="podcast-title" id='podcast-title'>{textup}</div>
-                <div class="podcast-subtitle" id='podcast-subtitle'>{textdown}</div>
-            </div>
+            {seekbar}
+
         </div>
-        <div{display}>
-            <progress class="podcast-progress" id='podcast-progress' value="0" max="1"></progress>
-            <div class="f-container" id='f-container'> 
-                <div class="podcast-time" id='podcast-time'>00:00 / 00:00</div>
-                <div class="podcast-speed" id='podcast-speed'>
-                    <a class="podcast-speed-10 active" href="javascript:void(0)">1x</a> / <a class="podcast-speed-15" href="javascript:void(0)">1.5x</a> / <a class="podcast-speed-20" href="javascript:void(0)">2x</a>
-                </div> 
-            </div>
-        </div>
-    </div>
-
-</div>
-
-    <script>
-        $(function()"""+"""{"""+f"""
-            """+f"""
-            ans{i} = parseInt($(".checkans{str(galery_number)}_{str(global_i)}").html());
-            ans{i} = ans{i}-1;
-            $(".checkans{str(galery_number)+'_'+str(global_i)}").html(ans{i}.toString());
-            if (ans{i} <= 0)"""+"""{"""+f"""
-                $('.galery{str(galery_number)} button[type="next_{str(galery_number)}"]').css('background','#5199FF');
-                        $('.galery{str(galery_number)} button[type="next_{str(galery_number)}"]').val('1');"""+"""
-            }"""+f"""
-            $('.audio-add{i} audio').on("canplay", function()"""+"""{"""+f"""
-                $(this).parents().find('.audio-add{i} .podcast-time').html(toHHMMSS(this.currentTime)+" / "+toHHMMSS(this.duration))"""+"""
-            });"""+f"""
-            $('.audio-add{i} audio').on('ended', function()"""+"""{"""+f"""
-                if($('.audio-add{i} .podcast-playpause').hasClass('playing')) """+"""{"""+f"""
-                    $('.audio-add{i} .podcast-playpause').removeClass('playing');"""+"""
-                }"""+f"""
-                $(".audio-add{i} .audio-player{i}").stop();
-                $('.audio-add{i} .pause').hide(); 
-                $('.audio-add{i} .play').show();"""+"""
-            });"""+f"""
-            $('.audio-add{i} .podcast-playpause').on('click', function()"""+""" {"""+f""" 
-                //$(".audio-add{i} .audio-player{i}")[0].src = ;
-                //$(".audio-add{i} .audio-player{i}")[0].load();
-                let that = this;
-                let audio = $(this).parents().find('.audio-add{i} .audio-player{i}').get(0);
-                if($(this).hasClass('playing')) """+"""{"""+f"""
-                    $(this).removeClass('playing');
-                    audio.pause();
-                    $('.audio-add{i} .pause').hide(); 
-                    $('.audio-add{i} .play').show(); 
-                    $(audio).off('timeupdate');"""+"""
-                } else {"""+f"""
-                    $(this).addClass('playing');
-                    audio.play();
-                    $('.audio-add{i} .pause').show(); 
-                    $('.audio-add{i} .play').hide(); 
-                    $(audio).on('timeupdate', function() """+"""{ """+f"""
-                        $(that).parents().find('.audio-add{i} .podcast-progress').attr("value", this.currentTime / this.duration);
-                        $(that).parents().find('.audio-add{i} .podcast-time').html(toHHMMSS(this.currentTime)+" / "+toHHMMSS(this.duration))"""+"""
-                    });
-                }
-            });"""+f"""
-            $('.audio-add{i} .podcast-speed a').on('click', function()"""+""" {"""+f"""
-                $(this).siblings().removeClass('active');
-                $(this).addClass('active');
-                let audio = $(this).parents().find('.audio-add{i} .audio-player{i}').get(0);"""+"""
-                if($(this).hasClass('podcast-speed-10')) {
-                    audio.playbackRate=1;
-                }
-                else if($(this).hasClass('podcast-speed-15')) {
-                    audio.playbackRate=1.5;
-                }
-                else if($(this).hasClass('podcast-speed-20')) {
-                    audio.playbackRate=2;
-                }
-            });"""+f"""
-            $('.audio-add{i} .podcast-progress').on('click', function(e) """+"""{ console.log(this.offsetWidth)"""+f"""
-            let audio = $(this).parents().find('.audio-add{i} .audio-player{i}').get(0);
-                                                                        var percent = e.offsetX / this.offsetWidth;
-                                                                        audio.currentTime = percent * audio.duration;
-                                                                        $(this).val(percent);
-                                                                        $(this).parents().find('.audio-add{i}.podcast-time').html(toHHMMSS(audio.currentTime)+" / "+toHHMMSS(audio.duration))
-                                                                        """+"""
-                                                                        });
-        });
-
-        function toHHMMSS(sec) {
-            var sec_num = parseInt(sec, 10); 
-            var hours   = Math.floor(sec_num / 3600);
-            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-            var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-            if (hours   < 10) {hours   = "0"+hours;}
-            if (minutes < 10) {minutes = "0"+minutes;}
-            if (seconds < 10) {seconds = "0"+seconds;}
-            return hours == "00" ? minutes+':'+seconds : hours+':'+minutes+':'+seconds;
-        }
-    </script>
-
-    """
+        """
 
     result_all += result
     global_i_i += 1
@@ -1177,127 +1119,68 @@ def pr_audio_tts(s, galery_number, global_i, global_i_i):
 
     i = str(galery_number)+'_'+str(global_i)+'_'+str(global_i_i)
     s = s.split('\n')
-    textup = s[0]
-    textdown = s[1]
-    url = s[2]
+    textup = s[0].strip()
+    textdown = s[1].strip()
+    url = s[2].strip()
     words = url.split()
-    url = 'https://api.voicerss.org/?key=602e84f5eaf14cfc8a980c3c1a661083&hl=en-us&v=Mike&с=mp3&f=32khz_16bit_stereo&b64=true&src='
+    url = 'https://api.voicerss.org/?key=602e84f5eaf14cfc8a980c3c1a661083&hl=en-us&v=Mike&с=mp3&f=16khz_8bit_mono&src='
     for w in words:
         url += w + '%20'
-    url = requests.get(url).text
-    seekbar = int(s[3])
-    if seekbar == 0:
-        display = ' style="display:none"'
+    # url = requests.get(url).text
+    seekbar = bool(int(s[3]))
+    audio, created = Audio.objects.get_or_create(
+        text_up=textup,
+        text_down=textdown,
+        seekbar=seekbar,
+        src=url,
+        file=None,
+    )
+    if seekbar:
+        seekbar = """
+        <div>
+                    <progress class="podcast-progress" id='podcast-progress' value="0" max="1"
+                        onclick="audioTimeLineClick(this, event)"></progress>
+                    <div class="f-container" id='f-container'>
+                        <div class="podcast-time" id='podcast-time'>00:00 / 00:00</div>
+                        <div class="podcast-speed" id='podcast-speed'>
+                            <a class="podcast-speed-10 active" href="javascript:void(0)"
+                                onclick="audioChangeSpeedClick(this)">1x</a> / <a class="podcast-speed-15"
+                                href="javascript:void(0)" onclick="audioChangeSpeedClick(this)">1.5x</a> / <a
+                                class="podcast-speed-20" href="javascript:void(0)"
+                                onclick="audioChangeSpeedClick(this)">2x</a>
+                        </div>
+                    </div>
+                </div>
+        """
     else:
-        display = ''
+        seekbar = ""
 
     result = f"""
-    <div class='audio-tts{i}' id='audio-tts'>
-    <audio class="audio-player{i}" id='audio-player' src=""></audio> 
-    <div class="podcast-container" id='podcast-container'>
-        <div class="h-container" id='h-container'> 
-            <div class="podcast-playpause" id='podcast-playpause'>
-                <img class="play" id="play" src="https://fs.getcourse.ru/fileservice/file/download/a/44237/sc/337/h/cb28b80bb66ad56d3c12fd1885bc3ef8.svg" hspace="10" align="left">
-                <img class="pause" id="pause" src="https://fs.getcourse.ru/fileservice/file/download/a/44237/sc/197/h/7395c5433ab34099a1d5b9b139efdd5b.svg" hspace="10" align="left">
+    <div class='audio-tts{audio.id} audio-div' id='audio-tts'>
+            <audio class="audio-player{audio.id}" id='audio-player' src="{'https://'+ALLOWED_HOSTS[0]+audio.file.url if 'api.voicerss.org' in audio.src else audio.src}"
+                onended="audioOnEnded(this)" oncanplay="audioOnCanPlay(this)" onplay="audioPlay(this)"
+                onpause="audioPause(this)"></audio>
+            <div class="podcast-container" id='podcast-container'>
+                <div class="h-container" id='h-container'>
+                    <div class="podcast-playpause" id='podcast-playpause'>
+                        <img class="play" id="play"
+                            src="https://fs.getcourse.ru/fileservice/file/download/a/44237/sc/337/h/cb28b80bb66ad56d3c12fd1885bc3ef8.svg"
+                            onclick="playPauseClick(this)">
+                        <img class="pause" id="pause"
+                            src="https://fs.getcourse.ru/fileservice/file/download/a/44237/sc/197/h/7395c5433ab34099a1d5b9b139efdd5b.svg"
+                            onclick="playPauseClick(this)">
+                    </div>
+                    <div>
+                        <div class="podcast-title" id='podcast-title'>{audio.text_up}</div>
+                        <div class="podcast-subtitle" id='podcast-subtitle'>{audio.text_down}</div>
+                    </div>
+                </div>
+                
             </div>
-            <div>
-                <div class="podcast-title" id='podcast-title'>{textup}</div>
-                <div class="podcast-subtitle" id='podcast-subtitle'>{textdown}</div>
-            </div>
+            {seekbar}
+
         </div>
-        <div{display}>
-            <progress class="podcast-progress" id='podcast-progress' value="0" max="1"></progress>
-            <div class="f-container" id='f-container'> 
-                <div class="podcast-time" id='podcast-time'>00:00 / 00:00</div>
-                <div class="podcast-speed" id='podcast-speed'>
-                    <a class="podcast-speed-10 active" href="javascript:void(0)">1x</a> / <a class="podcast-speed-15" href="javascript:void(0)">1.5x</a> / <a class="podcast-speed-20" href="javascript:void(0)">2x</a>
-                </div> 
-            </div>
-        </div>
-    </div>
-
-
-</div>
-    <script>
-        $(function()"""+"""{"""+f"""
-            ans{i} = parseInt($(".checkans{str(galery_number)}_{str(global_i)}").html());
-            ans{i} = ans{i}-1;
-            $(".checkans{str(galery_number)+'_'+str(global_i)}").html(ans{i}.toString());
-            if (ans{i} <= 0)"""+"""{"""+f"""
-                $('.galery{str(galery_number)} button[type="next_{str(galery_number)}"]').css('background','#5199FF');
-                        $('.galery{str(galery_number)} button[type="next_{str(galery_number)}"]').val('1');"""+"""
-            }"""+f"""
-            $('.audio-tts{i} audio').on("canplay", function()"""+"""{"""+f"""
-                $(this).parents().find('.audio-tts{i} .podcast-time').html(toHHMMSS(this.currentTime)+" / "+toHHMMSS(this.duration))"""+"""
-            });"""+f"""
-            $('.audio-tts{i} audio').on('ended', function()"""+"""{"""+f"""
-                if($('.audio-tts{i} .podcast-playpause').hasClass('playing')) """+"""{"""+f"""
-                    $('.audio-tts{i} .podcast-playpause').removeClass('playing');"""+"""
-                }"""+f"""
-                $(".audio-tts{i} .audio-player{i}").stop();
-                $('.audio-tts{i} .pause').hide(); 
-                $('.audio-tts{i} .play').show();"""+"""
-            });"""+f"""
-            $('.audio-tts{i} .podcast-playpause').on('click', function()"""+""" {"""+f""" 
-                $(".audio-tts{i} .audio-player{i}")[0].src = "{url}";
-                $(".audio-tts{i} .audio-player{i}")[0].load();
-                let that = this;
-                let audio = $(this).parents().find('.audio-tts{i} .audio-player{i}').get(0);
-                if($(this).hasClass('playing')) """+"""{"""+f"""
-                    $(this).removeClass('playing');
-                    audio.pause();
-                    $('.audio-tts{i} .pause').hide(); 
-                    $('.audio-tts{i} .play').show(); 
-                    $(audio).off('timeupdate');"""+"""
-                } else {"""+f"""
-                    $(this).addClass('playing');
-                    audio.play();
-                    $('.audio-tts{i} .pause').show(); 
-                    $('.audio-tts{i} .play').hide(); 
-                    $(audio).on('timeupdate', function() """+"""{ """+f"""
-                        $(that).parents().find('.audio-tts{i} .podcast-progress').attr("value", this.currentTime / this.duration);
-                        $(that).parents().find('.audio-tts{i} .podcast-time').html(toHHMMSS(this.currentTime)+" / "+toHHMMSS(this.duration))"""+"""
-                    });
-                }
-            });"""+f"""
-            $('.audio-tts{i} .podcast-speed a').on('click', function()"""+""" {"""+f"""
-                $(this).siblings().removeClass('active');
-                $(this).addClass('active');
-                let audio = $(this).parents().find('.audio-tts{i} .audio-player{i}').get(0);"""+"""
-                if($(this).hasClass('podcast-speed-10')) {
-                    audio.playbackRate=1;
-                }
-                else if($(this).hasClass('podcast-speed-15')) {
-                    audio.playbackRate=1.5;
-                }
-                else if($(this).hasClass('podcast-speed-20')) {
-                    audio.playbackRate=2;
-                }
-            });"""+f"""
-            $('.audio-tts{i} .podcast-progress').on('click', function(e) """+"""{ console.log(this.offsetWidth)"""+f"""
-            let audio = $(this).parents().find('.audio-tts{i} .audio-player{i}').get(0);
-                                                                        var percent = e.offsetX / this.offsetWidth;
-                                                                        audio.currentTime = percent * audio.duration;
-                                                                        $(this).val(percent);
-                                                                        $(this).parents().find('.audio-tts{i}.podcast-time').html(toHHMMSS(audio.currentTime)+" / "+toHHMMSS(audio.duration))
-                                                                        """+"""
-                                                                        });
-        });
-
-        function toHHMMSS(sec) {
-            var sec_num = parseInt(sec, 10); 
-            var hours   = Math.floor(sec_num / 3600);
-            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-            var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-            if (hours   < 10) {hours   = "0"+hours;}
-            if (minutes < 10) {minutes = "0"+minutes;}
-            if (seconds < 10) {seconds = "0"+seconds;}
-            return hours == "00" ? minutes+':'+seconds : hours+':'+minutes+':'+seconds;
-        }
-    </script>
-    
-    """
+        """
 
     result_all += result
     global_i_i += 1
